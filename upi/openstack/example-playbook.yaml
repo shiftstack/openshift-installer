@@ -7,6 +7,7 @@
   tasks:
 
     # add what you need
+    # you may add tags to control which bits are actually executed
 
     - import_role:
         name: openshift-upi

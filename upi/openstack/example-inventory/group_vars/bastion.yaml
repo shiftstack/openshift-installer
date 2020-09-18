@@ -64,8 +64,8 @@ os_ingress_fip: '203.0.113.19'
 # os_compute_volume_size: 120
 #
 # Set to 'True' when using a rootvolume for control plane nodes
-# os_compute_boot_from_volume: True
+# os_cp_boot_from_volume: True
 # Set to 'False' when you want to keep the rootvolumes after the control plane node got deleted
-# os_compute_terminate_volume: True
+# os_cp_terminate_volume: True
 # volume size for root volume in GB
-# os_compute_volume_size: 120
+# os_cp_volume_size: 120
