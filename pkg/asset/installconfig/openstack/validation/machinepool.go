@@ -49,7 +49,15 @@ func ValidateMachinePool(p *openstack.MachinePool, ci *CloudInfo, controlPlane b
 		checkStorageFlavor = true
 	}
 
+	// flavorName = p.flavorname
+	// flavorPath = fldPath.Child("type")
+	// if flavorName == "" {
+	//		flavorName = platform.flavor
+	//		flavorPath = field.NewPath("platform", "openstack", "computeFlavor")
+	// }
+
 	if controlPlane {
+		// allErrs = append(allErrs, validateFlavor(flavorName, ci, ctrlPlaneFlavorMinimums, flavorPath, checkStorageFlavor)...)
 		allErrs = append(allErrs, validateFlavor(p.FlavorName, ci, ctrlPlaneFlavorMinimums, fldPath.Child("type"), checkStorageFlavor)...)
 	} else {
 		allErrs = append(allErrs, validateFlavor(p.FlavorName, ci, computeFlavorMinimums, fldPath.Child("type"), checkStorageFlavor)...)
