@@ -106,13 +106,6 @@ func defaultGCPMachinePoolPlatform() gcptypes.MachinePool {
 	}
 }
 
-func defaultOpenStackMachinePoolPlatform(flavor string) openstacktypes.MachinePool {
-	return openstacktypes.MachinePool{
-		FlavorName: flavor,
-		Zones:      []string{""},
-	}
-}
-
 func defaultBareMetalMachinePoolPlatform() baremetaltypes.MachinePool {
 	return baremetaltypes.MachinePool{}
 }
@@ -346,14 +339,7 @@ func (w *Worker) Generate(dependencies asset.Parents) error {
 				machineSets = append(machineSets, set)
 			}
 		case openstacktypes.Name:
-			mpool := defaultOpenStackMachinePoolPlatform(ic.Platform.OpenStack.FlavorName)
-			mpool.Set(ic.Platform.OpenStack.DefaultMachinePlatform)
-			mpool.Set(pool.Platform.OpenStack)
-			pool.Platform.OpenStack = &mpool
-
-			imageName, _ := rhcosutils.GenerateOpenStackImageName(string(*rhcosImage), clusterID.InfraID)
-
-			sets, err := openstack.MachineSets(clusterID.InfraID, ic, &pool, imageName, "worker", "worker-user-data", &openstackclientconfig.ClientOpts{})
+			sets, err := openstack.MachineSets(clusterID.InfraID, ic, &pool, string(*rhcosImage), "worker", "worker-user-data", &openstackclientconfig.ClientOpts{})
 			if err != nil {
 				return errors.Wrap(err, "failed to create worker machine objects")
 			}

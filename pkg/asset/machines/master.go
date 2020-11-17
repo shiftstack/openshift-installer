@@ -534,3 +534,10 @@ func IsMachineManifest(file *asset.File) bool {
 		return matched
 	}
 }
+
+func defaultOpenStackMachinePoolPlatform(flavor string) openstacktypes.MachinePool {
+	return openstacktypes.MachinePool{
+		FlavorName: flavor,
+		Zones:      []string{""},
+	}
+}
