@@ -153,8 +153,8 @@ type CreateOpts struct {
 	ContentLength      int64  `h:"Content-Length"`
 	ContentType        string `h:"Content-Type"`
 	CopyFrom           string `h:"X-Copy-From"`
-	DeleteAfter        int    `h:"X-Delete-After"`
-	DeleteAt           int    `h:"X-Delete-At"`
+	DeleteAfter        int64  `h:"X-Delete-After"`
+	DeleteAt           int64  `h:"X-Delete-At"`
 	DetectContentType  string `h:"X-Detect-Content-Type"`
 	ETag               string `h:"ETag"`
 	IfNoneMatch        string `h:"If-None-Match"`
@@ -388,11 +388,12 @@ type UpdateOptsBuilder interface {
 // deleting an object's metadata.
 type UpdateOpts struct {
 	Metadata           map[string]string
+	RemoveMetadata     []string
 	ContentDisposition string `h:"Content-Disposition"`
 	ContentEncoding    string `h:"Content-Encoding"`
 	ContentType        string `h:"Content-Type"`
-	DeleteAfter        int    `h:"X-Delete-After"`
-	DeleteAt           int    `h:"X-Delete-At"`
+	DeleteAfter        int64  `h:"X-Delete-After"`
+	DeleteAt           int64  `h:"X-Delete-At"`
 	DetectContentType  bool   `h:"X-Detect-Content-Type"`
 }
 
@@ -402,8 +403,13 @@ func (opts UpdateOpts) ToObjectUpdateMap() (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	for k, v := range opts.Metadata {
 		h["X-Object-Meta-"+k] = v
+	}
+
+	for _, k := range opts.RemoveMetadata {
+		h["X-Remove-Object-Meta-"+k] = "remove"
 	}
 	return h, nil
 }

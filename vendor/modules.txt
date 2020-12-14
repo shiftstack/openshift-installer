@@ -545,7 +545,7 @@ github.com/googleapis/gnostic/compiler
 github.com/googleapis/gnostic/extensions
 github.com/googleapis/gnostic/jsonschema
 github.com/googleapis/gnostic/openapiv2
-# github.com/gophercloud/gophercloud v0.12.1-0.20200827191144-bb4781e9de45
+# github.com/gophercloud/gophercloud v0.14.1-0.20201212032044-3647be39edaf
 ## explicit
 github.com/gophercloud/gophercloud
 github.com/gophercloud/gophercloud/internal
@@ -1197,7 +1197,7 @@ github.com/stoewer/go-strcase
 # github.com/stretchr/testify v1.6.1
 ## explicit
 github.com/stretchr/testify/assert
-# github.com/terraform-provider-openstack/terraform-provider-openstack v1.33.0
+# github.com/terraform-provider-openstack/terraform-provider-openstack v1.33.1-0.20201211173614-494b737724d9
 ## explicit
 github.com/terraform-provider-openstack/terraform-provider-openstack/openstack
 # github.com/terraform-providers/terraform-provider-aws v1.60.1-0.20200807230610-d5346d47e3af => github.com/openshift/terraform-provider-aws v1.60.1-0.20200630224953-76d1fb4e5699
