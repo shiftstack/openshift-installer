@@ -301,9 +301,21 @@ variable "openstack_api_int_ip" {
   description = "IP on the node subnet reserved for api-int VIP."
 }
 
+variable "openstack_api_port_id" {
+  type = string
+  default = ""
+  description = "The ID of the API VIP port that already exists in OpenStack. Passing this will prevent the port from being created in Terraform"
+}
+
 variable "openstack_ingress_ip" {
   type = string
   description = "IP on the nodes subnet reserved for the ingress VIP."
+}
+
+variable "openstack_ingress_port_id" {
+  type = string
+  default = ""
+  description = "The ID of the Ingress VIP port that already exists in OpenStack. Passing this will prevent the port from being created in Terraform"
 }
 
 variable "openstack_external_dns" {

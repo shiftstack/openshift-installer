@@ -12,6 +12,7 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/tokens"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/subnets"
 	"github.com/gophercloud/utils/openstack/clientconfig"
+	openstackvalidation "github.com/openshift/installer/pkg/asset/installconfig/openstack/validation"
 	"github.com/openshift/installer/pkg/rhcos"
 	"github.com/openshift/installer/pkg/tfvars/internal/cache"
 	types_openstack "github.com/openshift/installer/pkg/types/openstack"
@@ -29,7 +30,9 @@ type config struct {
 	APIFloatingIP              string   `json:"openstack_api_floating_ip,omitempty"`
 	IngressFloatingIP          string   `json:"openstack_ingress_floating_ip,omitempty"`
 	APIVIP                     string   `json:"openstack_api_int_ip,omitempty"`
+	APIVIPPortID               string   `json:"openstack_api_port_id,omitempty"`
 	IngressVIP                 string   `json:"openstack_ingress_ip,omitempty"`
+	IngressVIPPortID           string   `json:"openstack_ingress_port_id,omitempty"`
 	TrunkSupport               bool     `json:"openstack_trunk_support,omitempty"`
 	OctaviaSupport             bool     `json:"openstack_octavia_support,omitempty"`
 	RootVolumeSize             int      `json:"openstack_master_root_volume_size,omitempty"`
@@ -45,7 +48,7 @@ type config struct {
 }
 
 // TFVars generates OpenStack-specific Terraform variables.
-func TFVars(masterConfigs []*v1alpha1.OpenstackProviderSpec, cloud string, externalNetwork string, externalDNS []string, apiFloatingIP string, ingressFloatingIP string, apiVIP string, ingressVIP string, baseImage string, baseImageProperties map[string]string, infraID string, userCA string, bootstrapIgn string, mpool *types_openstack.MachinePool, machinesSubnet string) ([]byte, error) {
+func TFVars(masterConfigs []*v1alpha1.OpenstackProviderSpec, cloud string, externalNetwork string, externalDNS []string, apiFloatingIP string, ingressFloatingIP string, apiVIP string, ingressVIP string, baseImage string, baseImageProperties map[string]string, infraID string, userCA string, bootstrapIgn string, mpool *types_openstack.MachinePool, machinesSubnet string, ci *openstackvalidation.CloudInfo) ([]byte, error) {
 	zones := []string{}
 	seen := map[string]bool{}
 	for _, config := range masterConfigs {
@@ -62,7 +65,9 @@ func TFVars(masterConfigs []*v1alpha1.OpenstackProviderSpec, cloud string, exter
 		APIFloatingIP:           apiFloatingIP,
 		IngressFloatingIP:       ingressFloatingIP,
 		APIVIP:                  apiVIP,
+		APIVIPPortID:            ci.APIVIPPortID,
 		IngressVIP:              ingressVIP,
+		IngressVIPPortID:        ci.IngressVIPPortID,
 		ExternalDNS:             externalDNS,
 		MachinesSubnet:          machinesSubnet,
 		MasterAvailabilityZones: zones,

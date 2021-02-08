@@ -79,7 +79,9 @@ module "topology" {
   api_floating_ip     = var.openstack_api_floating_ip
   ingress_floating_ip = var.openstack_ingress_floating_ip
   api_int_ip          = var.openstack_api_int_ip
+  api_port_id         = var.openstack_api_port_id
   ingress_ip          = var.openstack_ingress_ip
+  ingress_port_id     = var.openstack_ingress_port_id
   external_dns        = var.openstack_external_dns
   trunk_support       = var.openstack_trunk_support
   octavia_support     = var.openstack_octavia_support

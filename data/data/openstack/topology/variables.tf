@@ -43,7 +43,15 @@ variable "api_int_ip" {
   type = string
 }
 
+variable "api_port_id" {
+  type = string
+}
+
 variable "ingress_ip" {
+  type = string
+}
+
+variable "ingress_port_id" {
   type = string
 }
 

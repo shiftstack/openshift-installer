@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"fmt"
 	"net/url"
 
 	"github.com/gophercloud/gophercloud"
@@ -12,6 +13,7 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/images"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/layer3/floatingips"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/networks"
+	"github.com/gophercloud/gophercloud/openstack/networking/v2/ports"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/subnets"
 	"github.com/gophercloud/utils/openstack/clientconfig"
 	flavorutils "github.com/gophercloud/utils/openstack/compute/v2/flavors"
@@ -27,14 +29,16 @@ import (
 
 // CloudInfo caches data fetched from the user's openstack cloud
 type CloudInfo struct {
-	APIFIP          *floatingips.FloatingIP
-	ExternalNetwork *networks.Network
-	Flavors         map[string]Flavor
-	IngressFIP      *floatingips.FloatingIP
-	MachinesSubnet  *subnets.Subnet
-	OSImage         *images.Image
-	Zones           []string
-	Quotas          []quota.Quota
+	APIFIP           *floatingips.FloatingIP
+	ExternalNetwork  *networks.Network
+	Flavors          map[string]Flavor
+	IngressFIP       *floatingips.FloatingIP
+	MachinesSubnet   *subnets.Subnet
+	OSImage          *images.Image
+	Zones            []string
+	Quotas           []quota.Quota
+	APIVIPPortID     string
+	IngressVIPPortID string
 
 	clients *clients
 }
@@ -162,6 +166,20 @@ func (ci *CloudInfo) collectInfo(ic *types.InstallConfig, opts *clientconfig.Cli
 		return err
 	}
 
+	if ic.OpenStack.MachinesSubnet != "" && ic.OpenStack.APIVIP != "" {
+		ci.APIVIPPortID, err = ci.getVIPPort(ic.OpenStack.MachinesSubnet, ic.OpenStack.APIVIP)
+		if err != nil {
+			return err
+		}
+	}
+
+	if ic.OpenStack.MachinesSubnet != "" && ic.OpenStack.IngressVIP != "" {
+		ci.IngressVIPPortID, err = ci.getVIPPort(ic.OpenStack.MachinesSubnet, ic.OpenStack.IngressVIP)
+		if err != nil {
+			return err
+		}
+	}
+
 	ci.Zones, err = ci.getZones()
 	if err != nil {
 		return err
@@ -285,6 +303,36 @@ func (ci *CloudInfo) getFloatingIP(fip string) (*floatingips.FloatingIP, error) 
 		return &allFIPs[0], nil
 	}
 	return nil, nil
+}
+
+func (ci *CloudInfo) getVIPPort(subnet string, fixedIP string) (string, error) {
+	listOpts := ports.ListOpts{
+		FixedIPs: []ports.FixedIPOpts{{
+			// SubnetID:  subnet,
+			IPAddress: fixedIP,
+		}},
+	}
+
+	allPages, err := ports.List(ci.clients.networkClient, listOpts).AllPages()
+	if err != nil {
+		return "", err
+	}
+
+	ports, err := ports.ExtractPorts(allPages)
+	if err != nil {
+		panic(err)
+	}
+
+	switch {
+	case len(ports) == 0:
+		return "", nil
+
+	case len(ports) == 1:
+		return ports[0].ID, nil
+
+	default:
+		return "", fmt.Errorf("more than one port with fixed ip %s in subnet %s", fixedIP, subnet)
+	}
 }
 
 func (ci *CloudInfo) getImage(imageName string) (*images.Image, error) {

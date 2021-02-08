@@ -70,6 +70,7 @@ resource "openstack_networking_port_v2" "masters" {
 }
 
 resource "openstack_networking_port_v2" "api_port" {
+  count = var.api_port_id == "" ? 1 : 0
   name = "${var.cluster_id}-api-port"
 
   admin_state_up     = "true"
@@ -84,6 +85,7 @@ resource "openstack_networking_port_v2" "api_port" {
 }
 
 resource "openstack_networking_port_v2" "ingress_port" {
+  count = var.ingress_port_id == "" ? 1 : 0
   name = "${var.cluster_id}-ingress-port"
 
   admin_state_up     = "true"
@@ -128,14 +130,14 @@ resource "openstack_networking_trunk_v2" "masters" {
 
 resource "openstack_networking_floatingip_associate_v2" "api_fip" {
   count       = length(var.api_floating_ip) == 0 ? 0 : 1
-  port_id     = openstack_networking_port_v2.api_port.id
+  port_id     = var.api_port_id == "" ? openstack_networking_port_v2.api_port[0].id : var.api_port_id
   floating_ip = var.api_floating_ip
   depends_on  = [openstack_networking_router_interface_v2.nodes_router_interface]
 }
 
 resource "openstack_networking_floatingip_associate_v2" "ingress_fip" {
   count       = length(var.ingress_floating_ip) == 0 ? 0 : 1
-  port_id     = openstack_networking_port_v2.ingress_port.id
+  port_id     = var.ingress_port_id == "" ? openstack_networking_port_v2.ingress_port[0].id : var.ingress_port_id
   floating_ip = var.ingress_floating_ip
   depends_on  = [openstack_networking_router_interface_v2.nodes_router_interface]
 }

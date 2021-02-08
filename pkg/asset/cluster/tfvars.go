@@ -30,6 +30,7 @@ import (
 	awsconfig "github.com/openshift/installer/pkg/asset/installconfig/aws"
 	gcpconfig "github.com/openshift/installer/pkg/asset/installconfig/gcp"
 	openstackconfig "github.com/openshift/installer/pkg/asset/installconfig/openstack"
+	openstackvalidation "github.com/openshift/installer/pkg/asset/installconfig/openstack/validation"
 	ovirtconfig "github.com/openshift/installer/pkg/asset/installconfig/ovirt"
 	"github.com/openshift/installer/pkg/asset/machines"
 	"github.com/openshift/installer/pkg/asset/openshiftinstall"
@@ -401,6 +402,11 @@ func (t *TerraformVariables) Generate(parents asset.Parents) error {
 			return err
 		}
 
+		ci, err := openstackvalidation.GetCloudInfo(installConfig.Config)
+		if err != nil {
+			return err
+		}
+
 		var masterSpecs []*openstackprovider.OpenstackProviderSpec
 		for _, master := range masters {
 			masterSpecs = append(masterSpecs, master.Spec.ProviderSpec.Value.Object.(*openstackprovider.OpenstackProviderSpec))
@@ -421,6 +427,7 @@ func (t *TerraformVariables) Generate(parents asset.Parents) error {
 			bootstrapIgn,
 			installConfig.Config.ControlPlane.Platform.OpenStack,
 			installConfig.Config.Platform.OpenStack.MachinesSubnet,
+			ci,
 		)
 		if err != nil {
 			return errors.Wrapf(err, "failed to get %s Terraform variables", platform)
